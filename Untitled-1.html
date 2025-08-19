@@ -20,7 +20,18 @@
       text-align: left;
     }
     th {
-      background: #f0f0f0;
+      background: #2a4d69;         /* Header background color */
+      color: #fff;                 /* Header font color */
+      text-align: center;
+      position: sticky;            /* Freeze header */
+      top: 0;
+      z-index: 2;
+    }
+    thead {
+      background: #2a4d69;         /* Optional: reinforce header color */
+    }
+    tbody tr:nth-child(even) {
+      background: #f0f4f8;         /* Optional: alternate row color */
     }
   </style>
 </head>
@@ -28,7 +39,7 @@
 
 <h2>2025-2026 BTAAA Board Members</h2>
 
-<table>
+<table id="board-table">
   <thead>
     <tr>
       <th>Name</th>
@@ -38,19 +49,32 @@
     </tr>
   </thead>
   <tbody>
-    <tr><td contenteditable="true">Chris Luka</td><td contenteditable="true">President</td><td contenteditable="true">2023</td><td contenteditable="true">luka731chris@gmail.com</td></tr>
-    <tr><td contenteditable="true">Korey Long</td><td contenteditable="true">Vice President, Uniform Coordinator</td><td contenteditable="true">2020</td><td contenteditable="true">john.smith@example.com</td></tr>
-    <tr><td contenteditable="true">Stephanie Ceponis</td><td contenteditable="true">Secretary, Soccer Coordinator</td><td contenteditable="true">2018</td><td contenteditable="true">emily.j@example.com</td></tr>
-    <tr><td contenteditable="true">Matt Straub</td><td contenteditable="true">Treasurer, Basketball Coordinator</td><td contenteditable="true">2021</td><td contenteditable="true">mike.brown@example.com</td></tr>
-    <tr><td contenteditable="true">Elissa Tunno</td><td contenteditable="true">Member, Apparel Coordinator</td><td contenteditable="true">2017</td><td contenteditable="true">sophia.lee@example.com</td></tr>
-    <tr><td contenteditable="true">Brian Lohr</td><td contenteditable="true">Member</td><td contenteditable="true">2016</td><td contenteditable="true">david.w@example.com</td></tr>
-    <tr><td contenteditable="true">Laura Graeber</td><td contenteditable="true">Member, Concessions Coordinator</td><td contenteditable="true">2019</td><td contenteditable="true">olivia.m@example.com</td></tr>
-    <tr><td contenteditable="true">Brad Evans</td><td contenteditable="true">Member</td><td contenteditable="true">2015</td><td contenteditable="true">james.d@example.com</td></tr>
-    <tr><td contenteditable="true">Jake Young</td><td contenteditable="true">Member</td><td contenteditable="true">2021</td><td contenteditable="true">ava.g@example.com</td></tr>
-    <tr><td contenteditable="true">Graham Rihn</td><td contenteditable="true">Member</td><td contenteditable="true">2014</td><td contenteditable="true">will.m@example.com</td></tr>
-    <tr><td contenteditable="true">Patrick Kibler</td><td contenteditable="true">Member</td><td contenteditable="true">2018</td><td contenteditable="true">mia.r@example.com</td></tr>
-    <tr><td contenteditable="true">Roy Rudl</td><td contenteditable="true">Member</td><td contenteditable="true">2020</td><td contenteditable="true">ethan.m@example.com</td></tr>
-    <tr><td contenteditable="true">Patricia Rueffle</td><td contenteditable="true">Principal, Acting AD</td><td contenteditable="true">2018</td><td contenteditable="true">mia.r@example.com</td></tr>
+    <!-- Data will be loaded here -->
   </tbody>
 </table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script>
+  // Replace with your actual raw CSV URL
+  const csvUrl = 'https://raw.githubusercontent.com/luka731chris/btaaa-site/refs/heads/master/BoardMembers.csv';
 
+  Papa.parse(csvUrl, {
+    download: true,
+    header: true,
+    complete: function(results) {
+      const tbody = document.querySelector('#board-table tbody');
+      tbody.innerHTML = '';
+      results.data.forEach(row => {
+        if (row.Name) { // skip empty rows
+          tbody.innerHTML += `<tr>
+            <td>${row.Name}</td>
+            <td>${row.Position}</td>
+            <td>${row['Member Since']}</td>
+            <td>${row['Contact Info']}</td>
+          </tr>`;
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
