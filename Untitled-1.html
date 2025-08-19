@@ -18,20 +18,21 @@
       border: 1px solid #aaa;
       padding: 6px;
       text-align: left;
+      font-size: 1em; /* Add this line */
     }
     th {
-      background: #2a4d69;         /* Header background color */
-      color: #fff;                 /* Header font color */
+      background: #2a4d69;
+      color: #fff;
       text-align: center;
-      position: sticky;            /* Freeze header */
+      position: sticky;
       top: 0;
       z-index: 2;
     }
     thead {
-      background: #2a4d69;         /* Optional: reinforce header color */
+      background: #2a4d69;
     }
     tbody tr:nth-child(even) {
-      background: #f0f4f8;         /* Optional: alternate row color */
+      background: #f0f4f8;
     }
     @media (max-width: 600px) {
       body {
@@ -39,9 +40,13 @@
       }
       th, td {
         padding: 4px;
+        font-size: 0.85em; /* Make table text smaller on small screens */
       }
       h2 {
         font-size: 1.1em;
+      }
+      table {
+        font-size: 0.85em; /* Optional: shrink table font size */
       }
     }
   </style>
