@@ -5,44 +5,55 @@
   <title>Editable Table</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <style>
+    /* BODY */
     body {
       margin: 0;
       padding: 0;
       font-family: 'Open Sans', sans-serif;
       font-size: 13px;
-      overflow: hidden;
     }
+
+    /* TABLE TITLE */
     h2 {
       margin: 12px 0 8px 0;
       padding: 0 12px;
+      display: flex;               /* flex used only for centering text horizontally */
+      justify-content: center;      /* horizontal centering */
+      align-items: center;          /* vertical alignment within line height */
       text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: 2.5em; /* fallback for no JS */
-      transition: font-size 0.2s;
+      white-space: normal;          /* allow wrapping if screen too narrow */
+      overflow-wrap: break-word;
+      line-height: 1.2;
+      word-break: break-word;
     }
+
+    /* TABLE CONTAINER: top-justified, scrollable */
     .table-container {
       height: 80vh;
       width: 100%;
-      overflow-x: auto;
-      overflow-y: auto;
-      position: relative;
-      z-index: 100;
+      overflow-x: auto;  /* horizontal scroll if table is wider than container */
+      overflow-y: auto;  /* vertical scroll if table is taller than container */
       box-sizing: border-box;
-      padding-bottom: 16px; /* Add space for scrollbar */
+      padding-bottom: 16px;
     }
+
+    /* TABLE BASE STYLES */
     table {
       border-collapse: collapse;
       width: 100%;
+      font-size: 1em;
+      min-width: max-content; /* allow table to expand horizontally */
     }
+
     th, td {
       border: 1px solid #aaa;
-      padding: 6px;
       text-align: left;
-      font-size: 1em;
       background: #fff;
+      vertical-align: middle;
+      line-height: 1.4;
+      padding: 0.5em 0.7em;
     }
+
     th {
       background: #2a4d69;
       color: #fff;
@@ -51,42 +62,48 @@
       top: 0;
       z-index: 2;
     }
-    thead {
-      background: #2a4d69;
-    }
-    /* Alternating row shading for all columns */
-    tbody tr:nth-child(even) td,
-    tbody tr:nth-child(even) th {
+
+    /* Alternating row shading */
+    tbody tr:nth-child(even) td {
       background: #f0f4f8;
     }
+
+    /* Contact Info column: no wrapping, always fully visible */
+    th.contact-info,
+    td.contact-info {
+      white-space: nowrap;
+    }
+
+    /* RESPONSIVE STYLES */
     @media (max-width: 600px) {
       body {
         font-size: 12px;
         margin: 8px;
-        overflow: hidden;
-      }
-      h2 {
-        padding: 0 4px;
       }
       .table-container {
         max-width: 100vw;
         max-height: 70vh;
-        overflow: auto;
       }
       table {
         font-size: 0.95em;
         min-width: 480px;
       }
       th, td {
-        padding: 5px;
-        font-size: 0.95em;
+        padding: 0.4em 0.5em;
         word-break: break-word;
+      }
+      th.contact-info,
+      td.contact-info {
+        white-space: nowrap;
       }
     }
   </style>
 </head>
 <body>
-  <h2 id="table-title">2025-2026 BTAAA Board Members</h2>
+  <!-- Table title -->
+  <h2 id="table-title">2025-2026 Board Members</h2>
+
+  <!-- Table container: top-justified, scrollable -->
   <div class="table-container">
     <table id="board-table">
       <thead>
@@ -94,7 +111,7 @@
           <th>Name</th>
           <th>Position</th>
           <th>Member Since</th>
-          <th>Contact Info</th>
+          <th class="contact-info">Contact Info</th>
         </tr>
       </thead>
       <tbody>
@@ -102,30 +119,24 @@
       </tbody>
     </table>
   </div>
+
+  <!-- PapaParse CSV loading -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
   <script>
-    // Dynamically resize the table title to fit on one line
-    function fitTitleToOneLine() {
-      const title = document.getElementById('table-title');
-      if (!title) return;
-      const parent = title.parentElement;
-      // Set to a large font size to start
-      let fontSize = 80; // px
-      title.style.fontSize = fontSize + 'px';
-      title.style.whiteSpace = 'nowrap';
-      title.style.overflow = 'hidden';
-      title.style.textOverflow = 'ellipsis';
-      // Get available width
-      const maxWidth = parent.offsetWidth - 24; // account for padding
-      // Reduce font size until it fits
-      while (title.scrollWidth > maxWidth && fontSize > 12) {
-        fontSize -= 1;
-        title.style.fontSize = fontSize + 'px';
-      }
-    }
-    window.addEventListener('resize', fitTitleToOneLine);
-    window.addEventListener('DOMContentLoaded', fitTitleToOneLine);
+    const title = document.getElementById('table-title');
+    const headerCell = document.querySelector('#board-table thead th');
 
+    // Set title font size to 250% of header row font
+    function setTitleSize() {
+      if (!headerCell) return;
+      const headerFontSize = parseFloat(window.getComputedStyle(headerCell).fontSize);
+      title.style.fontSize = (headerFontSize * 2.5) + 'px';
+    }
+
+    window.addEventListener('resize', setTitleSize);
+    window.addEventListener('DOMContentLoaded', setTitleSize);
+
+    // Load CSV data
     const csvUrl = 'https://raw.githubusercontent.com/luka731chris/btaaa-site/refs/heads/master/BoardMembers.csv';
     Papa.parse(csvUrl, {
       download: true,
@@ -134,15 +145,16 @@
         const tbody = document.querySelector('#board-table tbody');
         tbody.innerHTML = '';
         results.data.forEach(row => {
-          if (row.Name) { // skip empty rows
+          if (row.Name) {
             tbody.innerHTML += `<tr>
               <td>${row.Name}</td>
               <td>${row.Position}</td>
               <td>${row['Member Since']}</td>
-              <td>${row['Contact Info']}</td>
+              <td class="contact-info">${row['Contact Info']}</td>
             </tr>`;
           }
         });
+        setTitleSize();
       }
     });
   </script>
